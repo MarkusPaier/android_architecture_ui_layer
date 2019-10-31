@@ -17,6 +17,7 @@
 package com.example.android.guesstheword.screens.game
 
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.GameFragmentBinding
+import kotlin.concurrent.timer
 
 /**
  * Fragment where the game is played
@@ -57,10 +59,12 @@ class GameFragment : Fragment() {
         binding.correctButton.setOnClickListener {
             viewModel.onCorrect()
         }
+
         binding.skipButton.setOnClickListener {
             viewModel.onSkip()
         }
 
+        //--------- OBSERVER ---------
         viewModel.word.observe(this, Observer { newWord ->
             binding.wordText.text = newWord.toString()
         })
@@ -68,6 +72,19 @@ class GameFragment : Fragment() {
         viewModel.score.observe(this, Observer { newScore ->
             binding.scoreText.text = newScore.toString()
         })
+
+        viewModel.eventGameFinish.observe(this, Observer { hasFinished ->
+            if (hasFinished) {
+                gameFinished()
+                viewModel.onGameFinishComplete() // -> because with each new coming back to
+                // the screen the gamefinished is called and since it is false at the beginning.
+                // So, the screen is set to gamefinished
+            }
+        })
+
+       viewModel.currentTime.observe(this, Observer { newTick ->
+           binding.timerText.text = newTick.toString()
+       })
 
         return binding.root
 
