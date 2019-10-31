@@ -57,7 +57,7 @@ class GameFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(GameViewModel::class.java)
 
         binding.gameViewModel = viewModel
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
 
         //--------- OBSERVER --------
 
@@ -70,10 +70,6 @@ class GameFragment : Fragment() {
             }
         })
 
-       viewModel.currentTime.observe(this, Observer { newTick ->
-           binding.timerText.text = newTick.toString()
-       })
-
         return binding.root
 
     }
@@ -81,7 +77,7 @@ class GameFragment : Fragment() {
     /**
      * Called when the game is finished
      */
-    fun gameFinished() {
+    private fun gameFinished() {
         val action = GameFragmentDirections.actionGameToScore(viewModel.score.value ?: 0)
         //action.setScore(viewModel.score.value ?: 0)
         findNavController(this).navigate(action)
